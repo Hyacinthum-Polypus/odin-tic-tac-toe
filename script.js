@@ -39,11 +39,20 @@ const displayController = (() =>
         playerXElement.appendChild(playerXInput);
         playerXInput.addEventListener('input', e => playerX.setName(playerXInput.value));
 
-        const playerOInput = document.createElement('input');
-        playerOInput.setAttribute('type', 'text');
-        playerOInput.setAttribute('value', playerO.getName());
-        playerOElement.appendChild(playerOInput);
-        playerOInput.addEventListener('input', e => playerO.setName(playerOInput.value));
+        if(!game.getAIMode())
+        {
+            const playerOInput = document.createElement('input');
+            playerOInput.setAttribute('type', 'text');
+            playerOInput.setAttribute('value', playerO.getName());
+            playerOElement.appendChild(playerOInput);
+            playerOInput.addEventListener('input', e => playerO.setName(playerOInput.value));    
+        }
+        else
+        {
+            const playerOInput = document.createElement('div');
+            playerOInput.textContent = playerO.getName();
+            playerOElement.appendChild(playerOInput);
+        }
     }
 
     const displayGameState = message =>
@@ -128,7 +137,7 @@ const game = (() =>
                 }
             }            
             return false;
-        };
+        }
         const hasEmptySpace = () =>
         {
             return getGameBoard().reduce((hasEmptySquare, currentSquare) =>
@@ -139,13 +148,14 @@ const game = (() =>
                 }
                 return hasEmptySquare;
             }, false);
-        };
+        }
 
         return {getGameBoard, clearGameBoard, getSquare, setSquare, checkRow, hasEmptySpace};
     })();
 
-    let turn = playerX.getMarker();
-    let gameOver = false;
+    let turn;
+    let gameOver;
+    let aiMode = false;
 
     const _getTurn = () =>
     {
@@ -161,15 +171,33 @@ const game = (() =>
     {
         turn = turn == playerX.getMarker() ? playerO.getMarker() : playerX.getMarker();
         displayController.displayGameState(`It is ${_getCurrentPlayer().getName()}'s turn`);
+
+        if(getAIMode() && turn == playerO.getMarker())
+        _playAIMove()
     }
 
-    const _restart = () =>
+    const _toggleAIMode = () =>
+    {
+        aiMode = !aiMode;
+        if(aiMode == true) playerO.setName('Computer'); else playerO.setName('Player O');
+        restart();
+    }
+
+    const getAIMode = () =>
+    {
+        return aiMode;
+    }
+
+    const restart = () =>
     {
         gameOver = false;
         gameBoard.clearGameBoard();
         turn = playerX.getMarker();
+        displayController.displayPlayerNames();
         displayController.displayBoard(gameBoard.getGameBoard());
+        displayController.displayGameState(`It is ${_getCurrentPlayer().getName()}'s turn`)
     }
+
 
     const _checkWin = square =>
     {
@@ -200,9 +228,60 @@ const game = (() =>
 
     }
 
+    const _playAIMove = () =>
+    {
+        //Check rows
+        for(let row = 0; row < 3; row++)
+        {
+            let count = 0;
+            let emptyIndex;
+            if(gameBoard.getSquare(3*row) == playerX.getMarker()) count++; else if(gameBoard.getSquare(3*row) == null) emptyIndex = 3*row;
+            if(gameBoard.getSquare(3*row+1) == playerX.getMarker()) count++; else if(gameBoard.getSquare(3*row+1) == null) emptyIndex = 3*row+1;
+            if(gameBoard.getSquare(3*row+2) == playerX.getMarker()) count++; else if(gameBoard.getSquare(3*row+2) == null) emptyIndex = 3*row+2;
+            if(count == 2 && emptyIndex != null) return input(emptyIndex);
+        }
+
+        //Check columns
+        for(let column = 0; column < 3; column++)
+        {
+            let count = 0;
+            let emptyIndex = null;
+            if(gameBoard.getSquare(column) == playerX.getMarker()) count++; else if(gameBoard.getSquare(column) == null) emptyIndex = column;
+            if(gameBoard.getSquare(column+3) == playerX.getMarker()) count++; else if(gameBoard.getSquare(column+3) == null) emptyIndex = column+3;
+            if(gameBoard.getSquare(column+6) == playerX.getMarker()) count++; else if(gameBoard.getSquare(column+6) == null) emptyIndex = column+6;
+            if(count == 2 && emptyIndex != null) return input(emptyIndex);
+        }
+
+        //Check diagnoal rows
+        let count = 0;
+        let emptyIndex = null;
+        if(gameBoard.getSquare(0) == playerX.getMarker()) count++; else if(gameBoard.getSquare(0) == null) emptyIndex = 0;
+        if(gameBoard.getSquare(4) == playerX.getMarker()) count++; else if(gameBoard.getSquare(4) == null) emptyIndex = 4;
+        if(gameBoard.getSquare(8) == playerX.getMarker()) count++; else if(gameBoard.getSquare(8) == null) emptyIndex = 8;
+        if(count == 2 && emptyIndex != null) return input(emptyIndex);
+
+        count = 0;
+        emptyIndex = null;
+        if(gameBoard.getSquare(2) == playerX.getMarker()) count++; else if(gameBoard.getSquare(2) == null) emptyIndex = 2;
+        if(gameBoard.getSquare(4) == playerX.getMarker()) count++; else if(gameBoard.getSquare(4) == null) emptyIndex = 4;
+        if(gameBoard.getSquare(6) == playerX.getMarker()) count++; else if(gameBoard.getSquare(6) == null) emptyIndex = 6;
+        if(count == 2 && emptyIndex != null) return input(emptyIndex);
+
+        //Make a random move
+        let randomNumber;
+        let successfulMove = true;
+        do
+        {
+            randomNumber =  Math.floor(Math.random()*100)%8;
+        }
+        while(gameBoard.getSquare(randomNumber) != null)
+
+        input(randomNumber);
+    }
+
     const input = squareIndex =>
     {
-        console.log('CLICK!')
+        console.log('CLICK! ')
         if(gameOver) return;
         if(gameBoard.getSquare(squareIndex) == null)
         {
@@ -222,14 +301,12 @@ const game = (() =>
     }
 
     //Game Init.
-    displayController.displayBoard(gameBoard.getGameBoard());
-    displayController.displayPlayerNames();
-    displayController.displayGameState(`It is ${playerX.getName()}'s turn`);
+    console.log(getAIMode());
 
-    document.getElementById('restart').addEventListener('click', _restart);
+    document.getElementById('restart').addEventListener('click', restart);
+    document.getElementById('ai-mode').addEventListener('click', _toggleAIMode);
 
-    return {input};
+    return {input, restart, getAIMode};
 })();
 
-
-
+game.restart();
