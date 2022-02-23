@@ -1,18 +1,3 @@
-const gameBoard = (() => 
-{
-    let gameBoardArray = [null, null, null, null, null, null, null, null, null];
-
-    const _isValidIndex = (index) => {return (index >= 0 && index < 9)};
-    const _indexError = () => {console.log("Invalid index! Only indexes 0-8")};
-
-    const getGameBoard = () => {return gameBoardArray};
-    const clearGameBoard = () => {gameBoardArray.forEach(square => square = null)};
-    const getSquare = (index) => {if(_isValidIndex(index)) { return gameBoardArray[index]} else {_indexError()}};
-    const setSquare = (index, marker) => {if(_isValidIndex(index)) {gameBoardArray[index] = marker; return gameBoardArray[index]} else {_indexError()}};
-
-    return {getGameBoard, clearGameBoard, getSquare, setSquare};
-})();
-
 const displayController = (() =>
 {
     const mainContainer = document.querySelector('.main-container');
@@ -22,7 +7,6 @@ const displayController = (() =>
 
         squares.forEach(square =>
         {
-            console.log(squares.length);
             mainContainer.removeChild(square);
         });
     }
@@ -46,6 +30,21 @@ const displayController = (() =>
 
 const game = (() => 
 {
+    const gameBoard = (() => 
+    {
+        let gameBoardArray = [null, null, null, null, null, null, null, null, null];
+
+        const _isValidIndex = (index) => {return (index >= 0 && index < 9)};
+        const _indexError = () => {console.log("Invalid index! Only indexes 0-8")};
+
+        const getGameBoard = () => {return gameBoardArray};
+        const clearGameBoard = () => {gameBoardArray.forEach(square => square = null)};
+        const getSquare = (index) => {if(_isValidIndex(index)) { return gameBoardArray[index]} else {_indexError()}};
+        const setSquare = (index, marker) => {if(_isValidIndex(index)) {gameBoardArray[index] = marker; return gameBoardArray[index]} else {_indexError()}};
+
+        return {getGameBoard, clearGameBoard, getSquare, setSquare};
+    })();
+
     const _playerFactory = ((name, marker) =>
     {
         const getName = () => {return name};
