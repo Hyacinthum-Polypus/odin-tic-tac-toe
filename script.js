@@ -56,7 +56,7 @@ const game = (() =>
     const playerX = _playerFactory("Player X", "X");
     const playerO = _playerFactory("Player O", "O");
 
-    let turn = 'X';
+    let turn = playerX.getMarker();
 
     const getTurn = () =>
     {
@@ -65,7 +65,7 @@ const game = (() =>
 
     const nextTurn = () =>
     {
-        turn = turn == 'X' ? 'O' : 'X';
+        turn = turn == playerX.getMarker() ? playerO.getMarker() : playerX.getMarker();
     }
 
     const input = (squareIndex) =>
@@ -83,6 +83,7 @@ const game = (() =>
         }
     }
 
+    //Init!
     displayController.displayBoard(gameBoard.getGameBoard());
 
     return {input};
