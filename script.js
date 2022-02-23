@@ -13,7 +13,7 @@ const displayController = (() =>
 
     const displayBoard = gameBoard => {
         _clearDisplay();
-
+        
         gameBoard.forEach((square, i) =>
         {
             const squareElement = document.createElement('div');
@@ -25,8 +25,34 @@ const displayController = (() =>
         });
     }
 
-    return {displayBoard};
+    const displayPlayerNames = () =>
+    {
+        const playerXElement = document.querySelector('.player-x');
+        const playerOElement = document.querySelector('.player-o');
+
+        playerXElement.textContent = playerX.getName();
+        playerOElement.textContent = playerO.getName();
+    }
+
+    const displayGameState = message =>
+    {
+        const gameStateElement = document.querySelector('header > h2');
+        gameStateElement.textContent = message;
+    }
+
+    return {displayBoard, displayPlayerNames, displayGameState};
 })();
+
+const playerFactory = ((name, marker) =>
+{
+    const getName = () => {return name};
+    const setName = (newName) => {name = newName};
+    const getMarker = () => {return marker};
+    return {getName, setName, getMarker};
+});
+
+const playerX = playerFactory("Player X", "X");
+const playerO = playerFactory("Player O", "O");
 
 const game = (() => 
 {
@@ -106,63 +132,68 @@ const game = (() =>
         return {getGameBoard, clearGameBoard, getSquare, setSquare, checkRow, hasEmptySpace};
     })();
 
-    const _playerFactory = ((name, marker) =>
-    {
-        const getName = () => {return name};
-        const setName = (newName) => {name = newName};
-        const getMarker = () => {return marker};
-        return {getName, setName, getMarker};
-    });
-
-    const playerX = _playerFactory("Player X", "X");
-    const playerO = _playerFactory("Player O", "O");
-
     let turn = playerX.getMarker();
+    let gameOver = false;
 
     const _getTurn = () =>
     {
         return turn;
     }
 
+    const _getCurrentPlayer = () =>
+    {
+        return  turn == playerX.getMarker() ? playerX : playerO;
+    }
+
     const _nextTurn = () =>
     {
         turn = turn == playerX.getMarker() ? playerO.getMarker() : playerX.getMarker();
+        displayController.displayGameState(`It is ${_getCurrentPlayer().getName()}'s turn`);
     }
 
     const _checkWin = square =>
     {
         if(gameBoard.checkRow(_getTurn(), square))
         {
-            console.log(`Player ${_getTurn()} has won.`);
+            console.log(`${_getCurrentPlayer().getName()} has won.`);
+            displayController.displayGameState(`${_getCurrentPlayer().getName()} has won.`);
+            gameOver = true;
         }
         else
         {
-            console.log(`Player ${_getTurn()} has not won yet.`);
+            console.log(`${_getCurrentPlayer().getName()} has not won yet.`);
         }
     }
 
     const _checkTie = () =>
     {
-        if(gameBoard.hasEmptySpace())
+        if(!gameBoard.hasEmptySpace())
         {
-            console.log('The game has not tied');
+            console.log('The game has tied!');
+            displayController.displayGameState("Tie! Game Over!");
+            gameOver = true;
         }
         else
         {
-            console.log('The game has tied!');
+            console.log('The game has not tied');
         }
+
     }
 
     const input = (squareIndex) =>
     {
         console.log('CLICK!')
+        if(gameOver) return;
         if(gameBoard.getSquare(squareIndex) == null)
         {
             gameBoard.setSquare(squareIndex, _getTurn());
-            _checkWin(squareIndex);
-            _checkTie()
-            _nextTurn();
             displayController.displayBoard(gameBoard.getGameBoard());
+
+            _checkWin(squareIndex);
+            if(gameOver) return;
+            _checkTie()
+            if(gameOver) return;
+            _nextTurn();
         }
         else
         {
@@ -170,8 +201,10 @@ const game = (() =>
         }
     }
 
-    //Init!
+    //Game Init.
     displayController.displayBoard(gameBoard.getGameBoard());
+    displayController.displayPlayerNames();
+    displayController.displayGameState(`It is ${playerX.getName()}'s turn`);
 
     return {input};
 })();
