@@ -228,17 +228,21 @@ const game = (() =>
 
     }
 
-    const _playAIMove = () =>
+    const _checkImmediateWinLoss = marker =>
     {
         //Check rows
         for(let row = 0; row < 3; row++)
         {
             let count = 0;
             let emptyIndex;
-            if(gameBoard.getSquare(3*row) == playerX.getMarker()) count++; else if(gameBoard.getSquare(3*row) == null) emptyIndex = 3*row;
-            if(gameBoard.getSquare(3*row+1) == playerX.getMarker()) count++; else if(gameBoard.getSquare(3*row+1) == null) emptyIndex = 3*row+1;
-            if(gameBoard.getSquare(3*row+2) == playerX.getMarker()) count++; else if(gameBoard.getSquare(3*row+2) == null) emptyIndex = 3*row+2;
-            if(count == 2 && emptyIndex != null) return input(emptyIndex);
+            if(gameBoard.getSquare(3*row) == marker) count++; else if(gameBoard.getSquare(3*row) == null) emptyIndex = 3*row;
+            if(gameBoard.getSquare(3*row+1) == marker) count++; else if(gameBoard.getSquare(3*row+1) == null) emptyIndex = 3*row+1;
+            if(gameBoard.getSquare(3*row+2) == marker) count++; else if(gameBoard.getSquare(3*row+2) == null) emptyIndex = 3*row+2;
+            if(count == 2 && emptyIndex != null)
+            {
+                input(emptyIndex);
+                return true;
+            }            
         }
 
         //Check columns
@@ -246,30 +250,92 @@ const game = (() =>
         {
             let count = 0;
             let emptyIndex = null;
-            if(gameBoard.getSquare(column) == playerX.getMarker()) count++; else if(gameBoard.getSquare(column) == null) emptyIndex = column;
-            if(gameBoard.getSquare(column+3) == playerX.getMarker()) count++; else if(gameBoard.getSquare(column+3) == null) emptyIndex = column+3;
-            if(gameBoard.getSquare(column+6) == playerX.getMarker()) count++; else if(gameBoard.getSquare(column+6) == null) emptyIndex = column+6;
-            if(count == 2 && emptyIndex != null) return input(emptyIndex);
+            if(gameBoard.getSquare(column) == marker) count++; else if(gameBoard.getSquare(column) == null) emptyIndex = column;
+            if(gameBoard.getSquare(column+3) == marker) count++; else if(gameBoard.getSquare(column+3) == null) emptyIndex = column+3;
+            if(gameBoard.getSquare(column+6) == marker) count++; else if(gameBoard.getSquare(column+6) == null) emptyIndex = column+6;
+            if(count == 2 && emptyIndex != null)
+            {
+                input(emptyIndex);
+                return true;
+            } 
         }
 
         //Check diagnoal rows
         let count = 0;
         let emptyIndex = null;
-        if(gameBoard.getSquare(0) == playerX.getMarker()) count++; else if(gameBoard.getSquare(0) == null) emptyIndex = 0;
-        if(gameBoard.getSquare(4) == playerX.getMarker()) count++; else if(gameBoard.getSquare(4) == null) emptyIndex = 4;
-        if(gameBoard.getSquare(8) == playerX.getMarker()) count++; else if(gameBoard.getSquare(8) == null) emptyIndex = 8;
-        if(count == 2 && emptyIndex != null) return input(emptyIndex);
+        if(gameBoard.getSquare(0) == marker) count++; else if(gameBoard.getSquare(0) == null) emptyIndex = 0;
+        if(gameBoard.getSquare(4) == marker) count++; else if(gameBoard.getSquare(4) == null) emptyIndex = 4;
+        if(gameBoard.getSquare(8) == marker) count++; else if(gameBoard.getSquare(8) == null) emptyIndex = 8;
+        if(count == 2 && emptyIndex != null)
+        {
+            input(emptyIndex);
+            return true;
+        } 
 
         count = 0;
         emptyIndex = null;
-        if(gameBoard.getSquare(2) == playerX.getMarker()) count++; else if(gameBoard.getSquare(2) == null) emptyIndex = 2;
-        if(gameBoard.getSquare(4) == playerX.getMarker()) count++; else if(gameBoard.getSquare(4) == null) emptyIndex = 4;
-        if(gameBoard.getSquare(6) == playerX.getMarker()) count++; else if(gameBoard.getSquare(6) == null) emptyIndex = 6;
-        if(count == 2 && emptyIndex != null) return input(emptyIndex);
+        if(gameBoard.getSquare(2) == marker) count++; else if(gameBoard.getSquare(2) == null) emptyIndex = 2;
+        if(gameBoard.getSquare(4) == marker) count++; else if(gameBoard.getSquare(4) == null) emptyIndex = 4;
+        if(gameBoard.getSquare(6) == marker) count++; else if(gameBoard.getSquare(6) == null) emptyIndex = 6;
+        if(count == 2 && emptyIndex != null) 
+        {
+            input(emptyIndex);
+            return true;
+        }
 
-        //Make a random move
+        return false;
+    }
+
+    const _playAIMove = () =>
+    {
+        //Take immediate win
+        if(_checkImmediateWinLoss(playerO.getMarker())) return;
+
+        //Prevent immediate loss
+        if(_checkImmediateWinLoss(playerX.getMarker())) return;
+        
+        if(gameBoard.getSquare(4) == null) return input(4);
+
+        //Make a managed random move
         let randomNumber;
-        let successfulMove = true;
+
+        if(gameBoard.getSquare(4) == playerO.getMarker())
+        {
+            do
+            {
+                randomNumber =  Math.floor(Math.random()*100)%4;
+                switch(randomNumber)
+                {
+                    case 0: randomNumber=1; break;
+                    case 1: randomNumber=3; break;
+                    case 2: randomNumber=5; break;
+                    case 3: randomNumber=7; break;
+                }
+            }
+            while(gameBoard.getSquare(randomNumber) != null)
+    
+            return input(randomNumber);
+        }
+
+        if(gameBoard.getSquare(4) == playerX.getMarker())
+        {
+            do
+            {
+                randomNumber =  Math.floor(Math.random()*100)%4;
+                switch(randomNumber)
+                {
+                    case 0: randomNumber=0; break;
+                    case 1: randomNumber=2; break;
+                    case 2: randomNumber=6; break;
+                    case 3: randomNumber=8; break;
+                }
+            }
+            while(gameBoard.getSquare(randomNumber) != null)
+    
+            return input(randomNumber);
+        }
+
+        //Make a completely random move
         do
         {
             randomNumber =  Math.floor(Math.random()*100)%8;
