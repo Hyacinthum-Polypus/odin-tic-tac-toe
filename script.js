@@ -231,13 +231,13 @@ const game = (() =>
     const _checkImmediateWinLoss = marker =>
     {
         //Check rows
-        for(let row = 0; row < 3; row++)
+        for(let row = 0; row < 9; row+=3)
         {
             let count = 0;
             let emptyIndex;
-            if(gameBoard.getSquare(3*row) == marker) count++; else if(gameBoard.getSquare(3*row) == null) emptyIndex = 3*row;
-            if(gameBoard.getSquare(3*row+1) == marker) count++; else if(gameBoard.getSquare(3*row+1) == null) emptyIndex = 3*row+1;
-            if(gameBoard.getSquare(3*row+2) == marker) count++; else if(gameBoard.getSquare(3*row+2) == null) emptyIndex = 3*row+2;
+            if(gameBoard.getSquare(row) == marker) count++; else if(gameBoard.getSquare(row) == null) emptyIndex = row;
+            if(gameBoard.getSquare(row+1) == marker) count++; else if(gameBoard.getSquare(row+1) == null) emptyIndex = row+1;
+            if(gameBoard.getSquare(row+2) == marker) count++; else if(gameBoard.getSquare(row+2) == null) emptyIndex = row+2;
             if(count == 2 && emptyIndex != null)
             {
                 input(emptyIndex);
