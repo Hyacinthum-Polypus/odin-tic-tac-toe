@@ -30,8 +30,20 @@ const displayController = (() =>
         const playerXElement = document.querySelector('.player-x');
         const playerOElement = document.querySelector('.player-o');
 
-        playerXElement.textContent = playerX.getName();
-        playerOElement.textContent = playerO.getName();
+        playerXElement.removeChild(document.querySelector('.player-x > *'));
+        playerOElement.removeChild(document.querySelector('.player-o > *'));
+        
+        const playerXInput = document.createElement('input');
+        playerXInput.setAttribute('type', 'text');
+        playerXInput.setAttribute('value', playerX.getName());
+        playerXElement.appendChild(playerXInput);
+        playerXInput.addEventListener('input', e => playerX.setName(playerXInput.value));
+
+        const playerOInput = document.createElement('input');
+        playerOInput.setAttribute('type', 'text');
+        playerOInput.setAttribute('value', playerO.getName());
+        playerOElement.appendChild(playerOInput);
+        playerOInput.addEventListener('input', e => playerO.setName(playerOInput.value));
     }
 
     const displayGameState = message =>
@@ -110,7 +122,7 @@ const game = (() =>
                 {
                     return true;
                 }
-                else if(getGameBoard(2) == marker && getSquare(6) == marker)
+                else if(getSquare(2) == marker && getSquare(6) == marker)
                 {
                     return true;
                 }
@@ -180,7 +192,7 @@ const game = (() =>
 
     }
 
-    const input = (squareIndex) =>
+    const input = squareIndex =>
     {
         console.log('CLICK!')
         if(gameOver) return;
