@@ -76,7 +76,7 @@ const game = (() =>
         const _indexError = index => {console.log(`${index} is a invalid index! Only indexes 0-8`)};
 
         const getGameBoard = () => {return gameBoardArray};
-        const clearGameBoard = () => {gameBoardArray.forEach(square => square = null)};
+        const clearGameBoard = () => {console.log('restart'); gameBoardArray.forEach((square, index, array) => array[index] = null)};
         const getSquare = (index) => {if(_isValidIndex(index)) { return gameBoardArray[index]} else {_indexError(index)}};
         const setSquare = (index, marker) => {if(_isValidIndex(index)) {gameBoardArray[index] = marker; return gameBoardArray[index]} else {_indexError(index)}};
         const checkRow = (marker, square) =>
@@ -163,6 +163,14 @@ const game = (() =>
         displayController.displayGameState(`It is ${_getCurrentPlayer().getName()}'s turn`);
     }
 
+    const _restart = () =>
+    {
+        gameOver = false;
+        gameBoard.clearGameBoard();
+        turn = playerX.getMarker();
+        displayController.displayBoard(gameBoard.getGameBoard());
+    }
+
     const _checkWin = square =>
     {
         if(gameBoard.checkRow(_getTurn(), square))
@@ -217,6 +225,8 @@ const game = (() =>
     displayController.displayBoard(gameBoard.getGameBoard());
     displayController.displayPlayerNames();
     displayController.displayGameState(`It is ${playerX.getName()}'s turn`);
+
+    document.getElementById('restart').addEventListener('click', _restart);
 
     return {input};
 })();
