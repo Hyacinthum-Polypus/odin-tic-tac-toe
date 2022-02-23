@@ -18,10 +18,11 @@ const displayController = (() =>
     const mainContainer = document.querySelector('.main-container');
     
     const _clearDisplay = () => {
-        const squares = document.querySelectorAll('.square > *');
+        const squares = document.querySelectorAll('.main-container > *');
 
         squares.forEach(square =>
         {
+            console.log(squares.length);
             mainContainer.removeChild(square);
         });
     }
@@ -70,9 +71,10 @@ const game = (() =>
 
     const input = (squareIndex) =>
     {
-        if(getSquare(squareIndex) == null)
+        console.log('CLICK!')
+        if(gameBoard.getSquare(squareIndex) == null)
         {
-            setSquare(squareIndex, getTurn());
+            gameBoard.setSquare(squareIndex, getTurn());
             nextTurn();
             displayController.displayBoard(gameBoard.getGameBoard());
         }
@@ -84,7 +86,7 @@ const game = (() =>
 
     displayController.displayBoard(gameBoard.getGameBoard());
 
-    return {getTurn, nextTurn, input};
+    return {input};
 })();
 
 
