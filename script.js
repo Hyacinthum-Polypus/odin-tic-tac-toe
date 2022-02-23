@@ -91,8 +91,19 @@ const game = (() =>
             }            
             return false;
         };
+        const hasEmptySpace = () =>
+        {
+            return getGameBoard().reduce((hasEmptySquare, currentSquare) =>
+            {
+                if(currentSquare == null)
+                {
+                    hasEmptySquare = true;
+                }
+                return hasEmptySquare;
+            }, false);
+        };
 
-        return {getGameBoard, clearGameBoard, getSquare, setSquare, checkRow};
+        return {getGameBoard, clearGameBoard, getSquare, setSquare, checkRow, hasEmptySpace};
     })();
 
     const _playerFactory = ((name, marker) =>
@@ -130,6 +141,17 @@ const game = (() =>
         }
     }
 
+    const _checkTie = () =>
+    {
+        if(gameBoard.hasEmptySpace())
+        {
+            console.log('The game has not tied');
+        }
+        else
+        {
+            console.log('The game has tied!');
+        }
+    }
 
     const input = (squareIndex) =>
     {
@@ -138,6 +160,7 @@ const game = (() =>
         {
             gameBoard.setSquare(squareIndex, _getTurn());
             _checkWin(squareIndex);
+            _checkTie()
             _nextTurn();
             displayController.displayBoard(gameBoard.getGameBoard());
         }
